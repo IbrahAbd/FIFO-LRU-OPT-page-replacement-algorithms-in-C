@@ -3,13 +3,14 @@
 #include <string.h>
 
 void FIFO(char * refString, int maxFrames);
+void LRU(char * refString, int maxFrames);
 
 int pageFaults = 0;
 int hits = 0;
 
 int main(){
     //char str[100];
-    char str[] = "12311453";
+    char str[] = "12342156212376321236";
     //char choice[5];
     char choice[] = "FIFO";
     int size = 0;
@@ -29,7 +30,7 @@ int main(){
     printf("Page Replacement Algorithm: %s\n", choice);
     printf("\n");
 
-    FIFO(str,size);
+    LRU(str,size);
     printf("Page faults: %d\n", pageFaults);
     printf("Hits: %d\n", hits);
     return 0;
@@ -46,6 +47,59 @@ bool isHit(char page, char * frames[], int frameCount){
     return false;
 }
 
+void LRU(char * refString, int maxFrames){
+
+    //PROPERLY IMPLEMENT LRU
+
+    char * memoryPtr[maxFrames];
+    // Initialize memory frames to NULL.
+    for (int i = 0; i < maxFrames; i++) {
+        memoryPtr[i] = NULL;
+    }
+    int counter = 0;
+
+
+    char * leastRU[maxFrames];
+    for (int i = 0; i < maxFrames; i++) {
+        leastRU[i] = NULL;
+    }
+
+    for (int i=0; i < strlen(refString);++i){
+        if(isHit(refString[i], memoryPtr, maxFrames) == false){     // On page fault.
+            if (leastRU[counter] == NULL){
+                memoryPtr[counter] = &refString[i];
+                leastRU[counter] = &refString[i];
+                pageFaults++;
+            }
+            else{
+                // Implement it here
+            }
+
+
+
+        }
+        else {                                                      // On hit.
+            hits++;
+        }
+
+        counter++;
+        if (counter == maxFrames){                                  // Reset counter.
+            counter = 0;
+        }
+
+        char result[maxFrames];                                    // Temporary array to be returned.
+        for (int i = 0; i < maxFrames; i++) {                       // Loop through frames and return their result.
+            if (memoryPtr[i] != NULL ) {
+                result[i] = *memoryPtr[i];
+                printf("%c",result[i]);
+            }
+        }
+        printf("\n");
+    }
+
+}
+
+
 void FIFO(char * refString, int maxFrames){
     char * memoryPtr[maxFrames];
 
@@ -56,37 +110,26 @@ void FIFO(char * refString, int maxFrames){
     int counter = 0;
 
     // Loop through reference string and check if a hit/page faults occurs.
-    // Computer the new string that fits into the specified frame amount.
+    // Compute the new string that fits into the specified frame amount.
     for (int i=0; i < strlen(refString);++i){
-
-        if(isHit(refString[i], memoryPtr, maxFrames) == false){
+        if(isHit(refString[i], memoryPtr, maxFrames) == false){     // On page fault.
             memoryPtr[counter] = &refString[i];
             counter++;
-            if (counter == maxFrames){          //Reset counter.
+            if (counter == maxFrames){                              // Reset counter.
                     counter = 0;
             }
             pageFaults++;
 
         }
-        else {
+        else {                                                      // On hit.
             hits++;
         }
 
-        static char result[3];
-        for (int i = 0; i < maxFrames; i++) {
-            if (memoryPtr[i] != NULL) {
+        static char result[3];                                      // Temporary array to be returned.
+        for (int i = 0; i < maxFrames; i++) {                       // Loop through frames and return their result.
+            if (memoryPtr[i] != NULL ) {
                 result[i] = *memoryPtr[i];
                 printf("%c",result[i]);
-            }
-            else if (isHit(refString[i], memoryPtr, maxFrames) == true){
-                    printf("-");
-            }
-            //===========================================================
-                // make it so that on hit you get - in the output
-                // Finish LRU and OPT tomorrow.
-            //===========================================================
-            else {
-                printf("-");
             }
         }
         printf("\n");
